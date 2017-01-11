@@ -57,6 +57,26 @@ module ``about the stock example`` =
 
     [<Koan>]
     let YouGotTheAnswerCorrect() =
-        let result =  __
+        let splitCommas (x:string) =
+            x.Split([|','|])        
+
+        let openingValue x =
+            System.Double.Parse(Seq.nth 1 x)
+
+        let closingValue x =
+            System.Double.Parse(Seq.nth 4 x)
+
+        let calculateVariance x =
+            abs (openingValue x - closingValue x)
+
+        let sortByVariance =
+            (fun x -> calculateVariance x)
+
+        let result =
+            stockData.Tail
+            |> Seq.map splitCommas
+            |> Seq.maxBy sortByVariance
+            |> Seq.nth 0           
+
         
         AssertEquality "2012-03-13" result
