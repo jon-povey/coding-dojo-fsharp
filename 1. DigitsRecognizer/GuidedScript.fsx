@@ -35,6 +35,7 @@
 // Try typing let x = 42 in the script file, 
 // right-click and select "Execute in interactive".
 
+let x = 42;;
 // let "binds" the value on the right to a name.
 
 // Try now typing x + 3;; in the F# Interactive window.
@@ -72,7 +73,7 @@ open System.IO
 //File.ReadAllLines(path)
 // returns an array of strings for each line 
  
-// [ YOUR CODE GOES HERE! ]
+let trainingSamples = File.ReadAllLines(@"C:\Craftmanship\Dojo-Digits-Recognizer\Dojo\trainingsample.csv")
  
  
 // 2. EXTRACTING COLUMNS
@@ -100,9 +101,10 @@ let lengths2 = strings |> Array.map (fun s -> s.Length)
 let csvToSplit = "1,2,3,4,5"
 let splitResult = csvToSplit.Split(',')
  
+let stringSplitter (x:string) = x.Split(',')
  
-// [ YOUR CODE GOES HERE! ]
- 
+let splitString = trainingSamples |> Array.map(fun s -> stringSplitter s)
+Console.WriteLine (sprintf "%A" splitString.[0])
  
 // 3. CLEANING UP HEADERS
  
@@ -119,10 +121,11 @@ let twoToFive = someNumbers.[ 1 .. 4 ] // grab a slice
 let upToThree = someNumbers.[ .. 2 ] 
 // </F# QUICK-STARTER> 
 
+let splitStringlength = splitString.Length
 
-// [ YOUR CODE GOES HERE! ]
- 
- 
+let tail = splitString.[1 .. splitStringlength-1]
+Console.WriteLine (sprintf "%A" splitString.[0])  
+
 // 4. CONVERTING FROM STRINGS TO INTS
  
 // Now that we have an array containing arrays of strings,
@@ -133,10 +136,17 @@ let upToThree = someNumbers.[ .. 2 ]
 // The following might help:
 let castedInt = (int)"42"
 // or, alternatively:
-let convertedInt = Convert.ToInt32("42")
+let convertedInt = Convert.ToInt32("42") 
  
- 
-// [ YOUR CODE GOES HERE! ]
+let convertStringToInt (x : string) = Convert.ToInt32(x)
+
+let mapListOfStringToInt x = 
+    x |> Array.map(fun s -> convertStringToInt(s))
+
+let integerTrainingSamples = 
+    tail |> Array.map(fun s -> mapListOfStringToInt s)
+
+Console.WriteLine (sprintf "%A" integerTrainingSamples.[0])
  
  
 // 5. CONVERTING ARRAYS TO RECORDS
@@ -152,22 +162,27 @@ type Example = { Label:int; Pixels:int[] }
 let example = { Label = 1; Pixels = [| 1; 2; 3; |] }
 // </F# QUICK-STARTER>  
 
- 
-// [ YOUR CODE GOES HERE! ]
- 
+type trainingRecord = {Numbers:int[]}
+
+let createTrainingRecord x = 
+    {Numbers = x}
+
+let trainingRecords = 
+    integerTrainingSamples
+    |> Array.map (fun x -> createTrainingRecord x)
+
+Console.WriteLine (sprintf "%A" trainingRecords) 
  
 // 6. COMPUTING DISTANCES
  
 // We need to compute the distance between images
-// Math reminder: the euclidean distance is
-// distance [ x1; y1; z1 ] [ x2; y2; z2 ] = 
-// sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2))
- 
+// Math reminder: the euclidean distance is   
+ //sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2))
 // <F# QUICK-STARTER> 
 // Array.map2 could come in handy here.
 // Suppose we have 2 arrays:
-let point1 = [| 0; 1; 2 |]
-let point2 = [| 3; 4; 5 |]
+let point1 = [| 0; 1; |]
+let point2 = [| 1; 2; |]
 // Array.map2 takes 2 arrays at a time
 // and maps pairs of elements, for instance:
 let map2Example = 
@@ -177,16 +192,20 @@ let map2Example =
 let map2PointsExample (P1: int[]) (P2: int[]) =
     Array.map2 (fun p1 p2 -> p1 + p2) P1 P2
 // </F# QUICK-STARTER>  
-
-
 // Having a function like
 let distance (p1: int[]) (p2: int[]) = 42
 // would come in very handy right now,
 // except that in this case, 
 // 42 is likely not the right answer
- 
-// [ YOUR CODE GOES HERE! ]
- 
+
+
+let calculateDistance (P1: int[]) (P2: int[]) =
+    Array.map2 (fun p1 p2 -> (p1-p2)*(p1-p2)) P1 P2
+    |> Array.sum
+    |> fun (x:int) -> sqrt (Convert.ToDouble x)
+
+let test = calculateDistance point1 point2
+Console.WriteLine (sprintf "%A" test) 
  
 // 7. WRITING THE CLASSIFIER FUNCTION
  
