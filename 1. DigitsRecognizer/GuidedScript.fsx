@@ -73,7 +73,7 @@ open System.IO
 //File.ReadAllLines(path)
 // returns an array of strings for each line 
  
-let trainingSamples = File.ReadAllLines(@"C:\Craftmanship\Dojo-Digits-Recognizer\Dojo\trainingsample.csv")
+let trainingSamples = File.ReadAllLines(@"C:\Craftmanship\coding-dojo-fsharp\1. DigitsRecognizer\trainingsample.csv")
  
  
 // 2. EXTRACTING COLUMNS
@@ -253,6 +253,11 @@ let classify (unknown:int[]) =
     // in a closure...
     0 
  
+let classifyDistance (unknown:int[]) = 
+    trainingRecords 
+    |> Array.minBy (fun x -> calculateDistance x.Numbers unknown)
+
+
 // [ YOUR CODE GOES HERE! ]
  
  
@@ -270,4 +275,13 @@ let classify (unknown:int[]) =
 // and compute the % correctly predicted.
  
  
+let validationSamples = File.ReadAllLines(@"C:\Craftmanship\coding-dojo-fsharp\1. DigitsRecognizer\validationsample.csv")
+let splitValidationSamples = validationSamples |> Array.map(fun s -> stringSplitter s)
+let splitValidationSampleslength = splitString.Length
+let validationSamplesTail = splitString.[1 .. splitValidationSampleslength-1] |> Array.map(fun s -> mapListOfStringToInt s)
+
+let testResult = classifyDistance validationSamplesTail.[0]
+
+Console.WriteLine (sprintf "%A" testResult) 
+
 // [ YOUR CODE GOES HERE! ]
