@@ -35,7 +35,6 @@
 // Try typing let x = 42 in the script file, 
 // right-click and select "Execute in interactive".
 
-let x = 42;;
 // let "binds" the value on the right to a name.
 
 // Try now typing x + 3;; in the F# Interactive window.
@@ -66,14 +65,14 @@ let greet name =
 // let's right-click / run in interactive, 
 // to have these namespaces loaded:
   
-open System
-open System.IO
+
 
 // the following might come in handy: 
 //File.ReadAllLines(path)
 // returns an array of strings for each line 
- 
-let trainingSamples = File.ReadAllLines(@"C:\Craftmanship\coding-dojo-fsharp\1. DigitsRecognizer\trainingsample.csv")
+
+open System
+open System.IO
  
  
 // 2. EXTRACTING COLUMNS
@@ -100,11 +99,7 @@ let lengths2 = strings |> Array.map (fun s -> s.Length)
 // The following function might help
 let csvToSplit = "1,2,3,4,5"
 let splitResult = csvToSplit.Split(',')
- 
-let stringSplitter (x:string) = x.Split(',')
- 
-let splitString = trainingSamples |> Array.map(fun s -> stringSplitter s)
-Console.WriteLine (sprintf "%A" splitString.[0])
+  
  
 // 3. CLEANING UP HEADERS
  
@@ -121,11 +116,9 @@ let twoToFive = someNumbers.[ 1 .. 4 ] // grab a slice
 let upToThree = someNumbers.[ .. 2 ] 
 // </F# QUICK-STARTER> 
 
-let splitStringlength = splitString.Length
 
-let tail = splitString.[1 .. splitStringlength-1]
-Console.WriteLine (sprintf "%A" splitString.[0])  
-
+ 
+ 
 // 4. CONVERTING FROM STRINGS TO INTS
  
 // Now that we have an array containing arrays of strings,
@@ -137,17 +130,7 @@ Console.WriteLine (sprintf "%A" splitString.[0])
 let castedInt = (int)"42"
 // or, alternatively:
 let convertedInt = Convert.ToInt32("42") 
- 
-let convertStringToInt (x : string) = Convert.ToInt32(x)
 
-let mapListOfStringToInt x = 
-    x |> Array.map(fun s -> convertStringToInt(s))
-
-let integerTrainingSamples = 
-    tail |> Array.map(fun s -> mapListOfStringToInt s)
-
-Console.WriteLine (sprintf "%A" integerTrainingSamples.[0])
- 
  
 // 5. CONVERTING ARRAYS TO RECORDS
  
@@ -157,32 +140,26 @@ Console.WriteLine (sprintf "%A" integerTrainingSamples.[0])
 // <F# QUICK-STARTER>  
 // Record quick starter: we can declare a 
 // Record (a lightweight, immutable class) type that way:
-type Example = { Label:int; Pixels:int[] }
+
 // and instantiate one this way:
-let example = { Label = 1; Pixels = [| 1; 2; 3; |] }
+
 // </F# QUICK-STARTER>  
 
-type trainingRecord = {Numbers:int[]}
 
-let createTrainingRecord x = 
-    {Numbers = x}
-
-let trainingRecords = 
-    integerTrainingSamples
-    |> Array.map (fun x -> createTrainingRecord x)
-
-Console.WriteLine (sprintf "%A" trainingRecords) 
+ 
  
 // 6. COMPUTING DISTANCES
  
 // We need to compute the distance between images
-// Math reminder: the euclidean distance is   
- //sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2))
+// Math reminder: the euclidean distance is
+// distance [ x1; y1; z1 ] [ x2; y2; z2 ] = 
+// sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2))
+ 
 // <F# QUICK-STARTER> 
 // Array.map2 could come in handy here.
 // Suppose we have 2 arrays:
-let point1 = [| 0; 1; |]
-let point2 = [| 1; 2; |]
+let point1 = [| 0; 1; 2 |]
+let point2 = [| 3; 4; 5 |]
 // Array.map2 takes 2 arrays at a time
 // and maps pairs of elements, for instance:
 let map2Example = 
@@ -192,20 +169,16 @@ let map2Example =
 let map2PointsExample (P1: int[]) (P2: int[]) =
     Array.map2 (fun p1 p2 -> p1 + p2) P1 P2
 // </F# QUICK-STARTER>  
+
+
 // Having a function like
 let distance (p1: int[]) (p2: int[]) = 42
 // would come in very handy right now,
 // except that in this case, 
 // 42 is likely not the right answer
+ 
 
-
-let calculateDistance (P1: int[]) (P2: int[]) =
-    Array.map2 (fun p1 p2 -> (p1-p2)*(p1-p2)) P1 P2
-    |> Array.sum
-    |> fun (x:int) -> sqrt (Convert.ToDouble x)
-
-let test = calculateDistance point1 point2
-Console.WriteLine (sprintf "%A" test) 
+ 
  
 // 7. WRITING THE CLASSIFIER FUNCTION
  
@@ -219,15 +192,15 @@ Console.WriteLine (sprintf "%A" test)
 // Array.minBy can be handy here, to find
 // the closest element in the Array of examples.
 // Suppose we have an Array of Example:
-let someData = 
-    [| { Label = 0; Pixels = [| 0; 1 |] };
-       { Label = 1; Pixels = [| 9; 2 |] };
-       { Label = 2; Pixels = [| 3; 4 |] }; |]
+//let someData = 
+//    [| { Label = 0; Pixels = [| 0; 1 |] };
+//       { Label = 1; Pixels = [| 9; 2 |] };
+//       { Label = 2; Pixels = [| 3; 4 |] }; |]
 // We can find for instance 
 // the element with largest first pixel
-let findThatGuy = 
-    someData 
-    |> Array.maxBy (fun x -> x.Pixels.[0])
+//let findThatGuy = 
+//    someData 
+//    |> Array.maxBy (fun x -> x.Pixels.[0])
 // </F# QUICK-STARTER> 
 
  
@@ -244,22 +217,14 @@ let functionWithClosure (x: int) =
  // The classifier function should probably
 // look like this - except that this one will
 // classify everything as a 0:
-let classify (unknown:int[]) =
+//let classify (unknown:int[]) =
     // do something smart here
     // like find the Example with
     // the shortest distance to
     // the unknown element...
     // and use the training examples
     // in a closure...
-    0 
- 
-let classifyDistance (unknown:int[]) = 
-    trainingRecords 
-    |> Array.minBy (fun x -> calculateDistance x.Numbers unknown)
-
-
-// [ YOUR CODE GOES HERE! ]
- 
+   // 0 
  
 // 8. EVALUATING THE MODEL AGAINST VALIDATION DATA
  
@@ -275,13 +240,51 @@ let classifyDistance (unknown:int[]) =
 // and compute the % correctly predicted.
  
  
-let validationSamples = File.ReadAllLines(@"C:\Craftmanship\coding-dojo-fsharp\1. DigitsRecognizer\validationsample.csv")
-let splitValidationSamples = validationSamples |> Array.map(fun s -> stringSplitter s)
-let splitValidationSampleslength = splitString.Length
-let validationSamplesTail = splitString.[1 .. splitValidationSampleslength-1] |> Array.map(fun s -> mapListOfStringToInt s)
+type Example = { Label:int; Pixels:int[] }
+ 
+let splitString (s:string) =
+    s.Split(',')
 
-let testResult = classifyDistance validationSamplesTail.[0]
+let covertListToInts (list:string[]) = list |> Array.map (fun s -> Convert.ToInt32(s))
 
-Console.WriteLine (sprintf "%A" testResult) 
+let createExampleRecord (intList:int[]) =
+    { Label = intList.[0]; Pixels = intList.[1 .. intList.Length - 1]}
+ 
+let removeFirstRow (rows:string[]) =
+    rows.[1 .. rows.Length - 1] 
 
-// [ YOUR CODE GOES HERE! ]
+let convertSamplesCSV csvpath =
+    File.ReadAllLines(csvpath)
+    |> fun (rows) -> removeFirstRow rows
+    |> Array.map (fun s -> splitString s)
+    |> Array.map (fun list -> covertListToInts list)
+    |> Array.map (fun ints -> createExampleRecord ints)
+
+let calculateDistance (p1: int[]) (p2: int[]) =
+    Array.map2 (fun p1 p2 -> (p1-p2)*(p1-p2)) p1 p2
+    |> Array.sum
+    |> fun (x:int) -> sqrt (Convert.ToDouble x)
+
+let trainingSamples = convertSamplesCSV @"C:\Craftmanship\coding-dojo-fsharp\1. DigitsRecognizer\trainingsample.csv"
+let validationSamples = convertSamplesCSV @"C:\Craftmanship\coding-dojo-fsharp\1. DigitsRecognizer\validationsample.csv"
+
+let classify (unknown:int[]) =
+    trainingSamples
+    |> Array.minBy (fun sample -> calculateDistance sample.Pixels unknown)
+
+let results = 
+    validationSamples
+    |> Array.map (fun s -> (classify s.Pixels).Label = s.Label)
+
+let validRecordsPercentage =
+    results
+    |> Array.filter (fun x -> x = true)
+    |> Array.length
+    |> fun (x) -> ((float x) / (float results.Length) * 100.0)
+
+Console.WriteLine (sprintf "%A" validRecordsPercentage) 
+
+
+
+
+
